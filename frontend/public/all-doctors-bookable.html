@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Bookable Doctors - ZenithCare Hospital</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #0d6efd;
+            text-align: center;
+        }
+        .stats {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .stats h2 {
+            margin: 0 0 10px 0;
+        }
+        .department {
+            background: white;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .department h3 {
+            color: #0d6efd;
+            margin: 0 0 10px 0;
+        }
+        .doctor-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .doctor {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 3px solid #0d6efd;
+        }
+        .doctor-name {
+            font-weight: bold;
+            color: #333;
+        }
+        .doctor-spec {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .doctor-avail {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 5px;
+        }
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+        .button {
+            display: inline-block;
+            background: #0d6efd;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background: #0b5ed7;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏥 All Bookable Doctors at ZenithCare Hospital</h1>
+
+    <div style="text-align: center;">
+        <a href="index.html" class="button">← Home</a>
+        <a href="appointment.html" class="button">📅 Book Appointment</a>
+        <a href="doctors.html" class="button">View Doctor Profiles</a>
+    </div>
+
+    <div class="stats">
+        <h2>📊 Hospital Statistics</h2>
+        <p><strong>Total Departments:</strong> <span id="totalDepts">Loading...</span></p>
+        <p><strong>Total Doctors Available for Booking:</strong> <span id="totalDocs">Loading...</span></p>
+        <p><strong>Status:</strong> <span id="status" style="color: green;">All systems operational ✅</span></p>
+    </div>
+
+    <div id="loading" class="loading">
+        <h3>Loading all doctors and departments...</h3>
+        <p>Please wait...</p>
+    </div>
+
+    <div id="content" style="display: none;"></div>
+
+    <script src="config.js"></script>
+    <script>
+        const API_URL = API_CONFIG.getApiUrl('/api');
+
+        async function loadAllDoctors() {
+            try {
+                const [deptRes, docRes] = await Promise.all([
+                    fetch(`${API_URL}/departments`),
+                    fetch(`${API_URL}/doctors`)
+                ]);
+
+                const deptData = await deptRes.json();
+                const docData = await docRes.json();
+
+                if (!deptData.success || !docData.success) {
+                    throw new Error('Failed to load data');
+                }
+
+                const departments = deptData.data;
+                const doctors = docData.data;
+
+                document.getElementById('totalDepts').textContent = departments.length;
+                document.getElementById('totalDocs').textContent = doctors.length;
+
+                const doctorsByDept = {};
+                doctors.forEach(doc => {
+                    const deptId = doc.department_id;
+                    if (!doctorsByDept[deptId]) {
+                        doctorsByDept[deptId] = [];
+                    }
+                    doctorsByDept[deptId].push(doc);
+                });
+
+                const content = document.getElementById('content');
+                content.innerHTML = '';
+
+                departments.sort((a, b) => a.name.localeCompare(b.name)).forEach(dept => {
+                    const deptDoctors = doctorsByDept[dept.id] || [];
+
+                    const deptDiv = document.createElement('div');
+                    deptDiv.className = 'department';
+
+                    deptDiv.innerHTML = `
+                        <h3>${dept.name} <span style="color: #666; font-size: 0.9em;">(${deptDoctors.length} doctors)</span></h3>
+                        <p style="color: #666; font-size: 0.95em;">${dept.description}</p>
+                        <div class="doctor-list"></div>
+                    `;
+
+                    const doctorList = deptDiv.querySelector('.doctor-list');
+
+                    if (deptDoctors.length === 0) {
+                        doctorList.innerHTML = '<p style="color: #999;">No doctors currently available in this department</p>';
+                    } else {
+                        deptDoctors.forEach(doctor => {
+                            const docDiv = document.createElement('div');
+                            docDiv.className = 'doctor';
+                            docDiv.innerHTML = `
+                                <div class="doctor-name">${doctor.full_name}</div>
+                                <div class="doctor-spec">${doctor.specialization}</div>
+                                <div class="doctor-avail">📅 ${doctor.availability}</div>
+                                ${doctor.is_active ? '<div style="color: green; font-size: 0.85em; margin: 5px 0;">✅ Available</div>' : '<div style="color: red; font-size: 0.85em; margin: 5px 0;">❌ Not available</div>'}
+                                <a href="appointment.html" style="display: inline-block; margin-top: 10px; padding: 6px 12px; background: #0d6efd; color: white; text-decoration: none; border-radius: 4px; font-size: 0.85em; ${!doctor.is_active ? 'opacity: 0.5; pointer-events: none;' : ''}">📅 Book Appointment</a>
+                            `;
+                            doctorList.appendChild(docDiv);
+                        });
+                    }
+
+                    content.appendChild(deptDiv);
+                });
+
+                document.getElementById('loading').style.display = 'none';
+                content.style.display = 'block';
+
+            } catch (error) {
+                document.getElementById('loading').innerHTML = `
+                    <h3 style="color: red;">❌ Error Loading Data</h3>
+                    <p>${error.message}</p>
+                    <p>Please make sure the backend server is running.</p>
+                `;
+                document.getElementById('status').innerHTML = '<span style="color: red;">System error ❌</span>';
+            }
+        }
+
+        loadAllDoctors();
+    </script>
+</body>
+</html>

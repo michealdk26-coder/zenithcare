@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Doctors - ZenithCare Hospital</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+        }
+
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #007BFF;
+        }
+
+        .admin-link {
+            color: #007BFF;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #333;
+            margin: 3px 0;
+        }
+
+
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007BFF;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .is-hidden {
+            display: none !important;
+        }
+
+        .filters-container {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #666;
+        }
+
+        .empty-state-grid {
+            text-align: center;
+            color: #666;
+            grid-column: 1/-1;
+        }
+
+        .doctor-status-wrap {
+            margin-top: 1rem;
+        }
+
+        .book-btn-disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        .doctors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .doctor-card {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .doctor-avatar {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .doctor-card h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .doctor-info {
+            text-align: left;
+            margin-bottom: 1rem;
+        }
+
+        .info-row {
+            margin: 0.5rem 0;
+            color: #666;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .book-btn {
+            display: block !important;
+            width: 100%;
+            margin-top: 1rem;
+            padding: 0.875rem 1.5rem;
+            background: #007BFF;
+            color: white !important;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,123,255,0.3);
+        }
+
+        .book-btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,123,255,0.4);
+        }
+
+        .filter-btn {
+            background: white;
+            border: 2px solid #007BFF;
+            color: #007BFF;
+            padding: 0.6rem 1.2rem;
+            margin: 0.3rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: #e7f3ff;
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: #007BFF;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .footer {
+            background: #1a1a2e;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+
+            .nav-menu {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background: white;
+                padding: 1rem;
+                box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .doctors-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">🏥 ZenithCare Hospital</a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="doctors.html" class="nav-link">Doctors</a></li>
+                <li><a href="appointment.html" class="nav-link">Book Appointment</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+                <li><a href="admin-login.html" class="nav-link admin-link">Admin</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+
+    <section class="page-header">
+        <h1>Our Expert Doctors</h1>
+        <p>Meet our team of highly qualified medical professionals</p>
+    </section>
+
+
+    <div class="container">
+        <div id="loadingSection" class="loading">
+            <div class="spinner"></div>
+            <p>Loading doctors...</p>
+        </div>
+
+        <div id="errorSection" class="error-message is-hidden"></div>
+
+
+        <div id="departmentFilters" class="filters-container is-hidden">
+            <button class="filter-btn active" data-department="all">All Departments</button>
+        </div>
+
+        <div id="doctorsGrid" class="doctors-grid"></div>
+    </div>
+
+
+    <footer class="footer">
+        <p>&copy; 2026 ZenithCare Hospital. All rights reserved.</p>
+    </footer>
+
+    <script src="config.js"></script>
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const navMenu = document.getElementById('navMenu');
+
+        hamburger.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+
+        let allDoctors = [];
+        let allDepartments = [];
+
+        async function fetchDoctors() {
+            const loadingSection = document.getElementById('loadingSection');
+            const errorSection = document.getElementById('errorSection');
+            const doctorsGrid = document.getElementById('doctorsGrid');
+            const departmentFilters = document.getElementById('departmentFilters');
+
+            try {
+                const doctorsResponse = await fetch(API_CONFIG.getApiUrl('/api/doctors'));
+                const doctorsData = await doctorsResponse.json();
+
+                const departmentsResponse = await fetch(API_CONFIG.getApiUrl('/api/departments'));
+                const departmentsData = await departmentsResponse.json();
+
+                loadingSection.classList.add('is-hidden');
+
+                if (doctorsData.success && doctorsData.data.length > 0) {
+                    allDoctors = doctorsData.data;
+                    allDepartments = departmentsData.success ? departmentsData.data : [];
+
+                    createDepartmentFilters(allDepartments);
+
+                    displayDoctors(allDoctors);
+                } else {
+                    doctorsGrid.innerHTML = '<p class="empty-state">No doctors available at the moment</p>';
+                }
+            } catch (error) {
+                loadingSection.classList.add('is-hidden');
+                errorSection.classList.remove('is-hidden');
+                errorSection.textContent = '⚠️ Unable to load doctors. Please try again later.';
+                console.error('Error fetching doctors:', error);
+            }
+        }
+
+        function createDepartmentFilters(departments) {
+            const filtersContainer = document.getElementById('departmentFilters');
+            filtersContainer.classList.remove('is-hidden');
+
+            departments.sort((a, b) => a.name.localeCompare(b.name));
+
+            departments.forEach(dept => {
+                const button = document.createElement('button');
+                button.className = 'filter-btn';
+                button.textContent = dept.name;
+                button.dataset.department = dept.id;
+                button.addEventListener('click', () => filterByDepartment(dept.id));
+                filtersContainer.appendChild(button);
+            });
+        }
+
+        function filterByDepartment(departmentId) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+
+            if (departmentId === 'all') {
+                document.querySelector('.filter-btn[data-department="all"]').classList.add('active');
+                displayDoctors(allDoctors);
+            } else {
+                document.querySelector(`.filter-btn[data-department="${departmentId}"]`).classList.add('active');
+                const normalizedDepartmentId = Number(departmentId);
+                const filteredDoctors = allDoctors.filter(doc => Number(doc.department_id) === normalizedDepartmentId);
+                displayDoctors(filteredDoctors);
+            }
+        }
+
+        function displayDoctors(doctors) {
+            const doctorsGrid = document.getElementById('doctorsGrid');
+            doctorsGrid.innerHTML = '';
+
+            if (doctors.length === 0) {
+                doctorsGrid.innerHTML = '<p class="empty-state-grid">No doctors found in this department</p>';
+                return;
+            }
+
+            doctors.forEach(doctor => {
+                const doctorCard = document.createElement('div');
+                doctorCard.className = 'doctor-card';
+                doctorCard.innerHTML = `
+                    <div class="doctor-avatar">👨‍⚕️</div>
+                    <h3>${doctor.full_name}</h3>
+                    <div class="doctor-info">
+                        <div class="info-row">
+                            <span class="info-label">Specialization:</span> ${doctor.specialization}
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Department:</span> ${doctor.department?.name || 'N/A'}
+                        </div>
+                        ${doctor.availability ? `
+                        <div class="info-row">
+                            <span class="info-label">Available:</span> ${doctor.availability}
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div class="doctor-status-wrap">
+                        <span class="status-badge ${doctor.is_active ? 'status-active' : 'status-inactive'}">
+                            ${doctor.is_active ? '✅ Available' : '❌ Not Available'}
+                        </span>
+                    </div>
+                    <a href="appointment.html?doctor_id=${doctor.id}&department_id=${doctor.department_id}" class="book-btn ${!doctor.is_active ? 'book-btn-disabled' : ''}">
+                        📅 Book Appointment
+                    </a>
+                `;
+                doctorsGrid.appendChild(doctorCard);
+            });
+        }
+
+        fetchDoctors();
+    </script>
+
+
+    <script src="chat-widget.js"></script>
+</body>
+</html>

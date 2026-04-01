@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - ZenithCare Hospital</title>
+    <link rel="stylesheet" href="appointment.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">🏥 ZenithCare Hospital</a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="doctors.html" class="nav-link">Doctors</a></li>
+                <li><a href="appointment.html" class="nav-link">Book Appointment</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+                <li><a href="admin-login.html" class="nav-link admin-link">Admin</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+
+    <section class="page-header">
+        <h1>Book an Appointment</h1>
+        <p>Schedule your visit with our expert medical team</p>
+    </section>
+
+
+    <div class="container">
+        <div class="form-card">
+            <div id="successAlert" class="alert alert-success is-hidden"></div>
+            <div id="errorAlert" class="alert alert-error is-hidden"></div>
+
+            <form id="appointmentForm">
+                <div class="form-group">
+                    <label for="patient_name">Full Name <span class="required">*</span></label>
+                    <input type="text" id="patient_name" name="patient_name" required placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number <span class="required">*</span></label>
+                    <input type="tel" id="phone" name="phone" required placeholder="+234 800 123 4567">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="michealdk26@gmail.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="department_id">Department <span class="required">*</span></label>
+                    <select id="department_id" name="department_id" required>
+                        <option value="">Select a department</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="doctor_id">Preferred Doctor (Optional)</label>
+                    <select id="doctor_id" name="doctor_id">
+                        <option value="">Any available doctor</option>
+                    </select>
+                    <small class="form-hint" id="doctorHint">Select a department first</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="appointment_date">Appointment Date <span class="required">*</span></label>
+                    <input type="date" id="appointment_date" name="appointment_date" required>
+                    <small class="form-hint">Select a date for your appointment</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="appointment_time">Appointment Time <span class="required">*</span></label>
+                    <select id="appointment_time" name="appointment_time" required>
+                        <option value="">Select time</option>
+                        <option value="09:00">09:00 AM</option>
+                        <option value="09:30">09:30 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="10:30">10:30 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="11:30">11:30 AM</option>
+                        <option value="12:00">12:00 PM</option>
+                        <option value="14:00">02:00 PM</option>
+                        <option value="14:30">02:30 PM</option>
+                        <option value="15:00">03:00 PM</option>
+                        <option value="15:30">03:30 PM</option>
+                        <option value="16:00">04:00 PM</option>
+                        <option value="16:30">04:30 PM</option>
+                        <option value="17:00">05:00 PM</option>
+                    </select>
+                    <small class="form-hint">Hospital hours: 9:00 AM - 5:00 PM</small>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">Book Appointment</button>
+            </form>
+        </div>
+    </div>
+
+
+    <footer class="footer">
+        <p>&copy; 2026 ZenithCare Hospital. All rights reserved.</p>
+    </footer>
+
+    <script src="config.js"></script>
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const navMenu = document.getElementById('navMenu');
+
+        hamburger.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+
+        const appointmentDateInput = document.getElementById('appointment_date');
+        const today = new Date();
+        const minDate = today.toISOString().split('T')[0];
+        appointmentDateInput.min = minDate;
+
+        let departments = [];
+        let doctors = [];
+
+        function getUrlParameter(param) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(param);
+        }
+
+        const urlDoctorId = getUrlParameter('doctor_id');
+        const urlDepartmentId = getUrlParameter('department_id');
+
+        console.log('URL Parameters - Doctor ID:', urlDoctorId, 'Department ID:', urlDepartmentId);
+
+        async function fetchData() {
+            try {
+                const [deptResponse, doctorResponse] = await Promise.all([
+                    fetch(API_CONFIG.getApiUrl('/api/departments')),
+                    fetch(API_CONFIG.getApiUrl('/api/doctors'))
+                ]);
+
+                const deptData = await deptResponse.json();
+                const doctorData = await doctorResponse.json();
+
+                if (deptData.success) {
+                    departments = deptData.data;
+                    populateDepartments();
+                }
+
+                if (doctorData.success) {
+                    doctors = doctorData.data;
+
+                    if (urlDoctorId) {
+                        setTimeout(() => {
+                            const doctorSelect = document.getElementById('doctor_id');
+                            doctorSelect.value = String(urlDoctorId);
+                            console.log('Set doctor from URL to:', doctorSelect.value);
+                        }, 150);
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        function populateDepartments() {
+            const departmentSelect = document.getElementById('department_id');
+            departments.forEach(dept => {
+                const option = document.createElement('option');
+                option.value = String(dept.id);  // Ensure value is a string
+                option.textContent = dept.name;
+                departmentSelect.appendChild(option);
+            });
+            console.log('Departments populated:', departments.length);
+
+            if (urlDepartmentId) {
+                setTimeout(() => {
+                    departmentSelect.value = String(urlDepartmentId);
+                    console.log('Set department from URL to:', departmentSelect.value);
+                    departmentSelect.dispatchEvent(new Event('change'));
+                }, 50);
+            }
+        }
+
+        document.getElementById('department_id').addEventListener('change', function() {
+            const departmentId = parseInt(this.value);
+            const doctorSelect = document.getElementById('doctor_id');
+
+            doctorSelect.innerHTML = '<option value="">Any available doctor</option>';
+
+            if (departmentId) {
+                const filteredDoctors = doctors.filter(doc =>
+                    Number(doc.department_id) === Number(departmentId) && doc.is_active
+                );
+
+                filteredDoctors.forEach(doctor => {
+                    const option = document.createElement('option');
+                    option.value = String(doctor.id);  // Ensure value is a string
+                    option.textContent = `${doctor.full_name} - ${doctor.specialization}`;
+                    doctorSelect.appendChild(option);
+                });
+            }
+        });
+
+        document.getElementById('appointmentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const successAlert = document.getElementById('successAlert');
+            const errorAlert = document.getElementById('errorAlert');
+            const submitBtn = document.getElementById('submitBtn');
+
+            successAlert.classList.add('is-hidden');
+            errorAlert.classList.add('is-hidden');
+
+            const appointmentDate = document.getElementById('appointment_date').value;
+            const appointmentTime = document.getElementById('appointment_time').value;
+
+            if (!appointmentDate || !appointmentTime) {
+                errorAlert.textContent = '⚠️ Please select both date and time for the appointment';
+                errorAlert.classList.remove('is-hidden');
+                return;
+            }
+
+            const dateTimeString = `${appointmentDate}T${appointmentTime}:00`;
+            const appointmentDateTime = new Date(dateTimeString);
+
+            if (isNaN(appointmentDateTime.getTime())) {
+                errorAlert.textContent = '⚠️ Invalid date or time selected';
+                errorAlert.classList.remove('is-hidden');
+                return;
+            }
+
+            const formData = {
+                patient_name: document.getElementById('patient_name').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value || null,
+                department_id: parseInt(document.getElementById('department_id').value),
+                doctor_id: document.getElementById('doctor_id').value ? parseInt(document.getElementById('doctor_id').value) : null,
+                appointment_date: appointmentDateTime.toISOString()
+            };
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Booking...';
+
+            try {
+                const response = await fetch(API_CONFIG.getApiUrl('/api/appointments'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    successAlert.textContent = '✅ ' + data.message;
+                    successAlert.classList.remove('is-hidden');
+                    document.getElementById('appointmentForm').reset();
+
+                    appointmentDateInput.min = minDate;
+
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    errorAlert.textContent = '⚠️ ' + data.message;
+                    errorAlert.classList.remove('is-hidden');
+                }
+            } catch (error) {
+                errorAlert.textContent = '⚠️ Unable to book appointment. Please try again later.';
+                errorAlert.classList.remove('is-hidden');
+                console.error('Error booking appointment:', error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Book Appointment';
+            }
+        });
+
+        fetchData();
+    </script>
+
+
+    <script src="chat-widget.js"></script>
+</body>
+</html>

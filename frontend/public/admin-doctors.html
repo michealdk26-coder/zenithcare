@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Doctors - ZenithCare Hospital</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: #1a1a2e;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header h2 {
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-header p {
+            opacity: 0.7;
+            font-size: 0.875rem;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .sidebar-link {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .sidebar-link.active {
+            background: #007BFF;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #007BFF;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-success {
+            background: #28A745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .section-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th,
+        table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-badge.active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-badge.inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .close {
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007BFF;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 968px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🏥 ZenithCare</h2>
+                <p>Admin Panel</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="admin-dashboard.html" class="sidebar-link">📊 Dashboard</a>
+                <a href="admin-appointments.html" class="sidebar-link">📅 Appointments</a>
+                <a href="admin-doctors.html" class="sidebar-link active">👨‍⚕️ Doctors</a>
+                <a href="admin-departments.html" class="sidebar-link">🏢 Departments</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="handleLogout()">🚪 Logout</button>
+            </div>
+        </aside>
+
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1>👨‍⚕️ Doctors Management</h1>
+                <button class="btn btn-primary" onclick="openAddDoctorModal()">➕ Add Doctor</button>
+            </div>
+
+            <div id="loadingSection" class="loading">
+                <div class="spinner"></div>
+                <p>Loading doctors...</p>
+            </div>
+
+            <div id="doctorsSection" class="section-card" style="display: none;">
+                <div class="table-container">
+                    <table id="doctorsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Specialization</th>
+                                <th>Department</th>
+                                <th>Availability</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+
+    <div id="doctorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Doctor</h2>
+                <span class="close" onclick="closeDoctorModal()">&times;</span>
+            </div>
+            <form id="doctorForm" onsubmit="handleDoctorSubmit(event)">
+                <input type="hidden" id="doctorId">
+
+                <div class="form-group">
+                    <label for="fullName">Full Name *</label>
+                    <input type="text" id="fullName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="specialization">Specialization *</label>
+                    <input type="text" id="specialization" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="departmentId">Department *</label>
+                    <select id="departmentId" required></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="availability">Availability *</label>
+                    <textarea id="availability" placeholder="e.g., Monday - Friday, 9:00 AM - 5:00 PM" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="isActive">Status</label>
+                    <select id="isActive">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeDoctorModal()">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save Doctor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const token = localStorage.getItem('zenithcare_token');
+        if (!token) {
+            window.location.href = 'admin-login.html';
+        }
+
+        let departments = [];
+        let doctors = [];
+
+        function handleLogout() {
+            localStorage.removeItem('zenithcare_token');
+            localStorage.removeItem('zenithcare_admin');
+            window.location.href = 'admin-login.html';
+        }
+
+        async function fetchData() {
+            try {
+                const [doctorsRes, departmentsRes] = await Promise.all([
+                    fetch(API_CONFIG.getApiUrl('/api/admin/doctors'), {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }),
+                    fetch(API_CONFIG.getApiUrl('/api/departments'))
+                ]);
+
+                const doctorsData = await doctorsRes.json();
+                const departmentsData = await departmentsRes.json();
+
+                if (doctorsData.success) {
+                    doctors = doctorsData.data;
+                    displayDoctors(doctors);
+                }
+
+                if (departmentsData.success) {
+                    departments = departmentsData.data;
+                    populateDepartmentDropdown();
+                }
+
+                document.getElementById('loadingSection').style.display = 'none';
+                document.getElementById('doctorsSection').style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to fetch data');
+            }
+        }
+
+        function displayDoctors(doctors) {
+            const tbody = document.querySelector('#doctorsTable tbody');
+            tbody.innerHTML = '';
+
+            if (doctors.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No doctors found</td></tr>';
+                return;
+            }
+
+            doctors.forEach(doctor => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>#${doctor.id}</td>
+                    <td>${doctor.full_name}</td>
+                    <td>${doctor.specialization}</td>
+                    <td>${doctor.department?.name || 'N/A'}</td>
+                    <td>${doctor.availability}</td>
+                    <td><span class="status-badge ${doctor.is_active ? 'active' : 'inactive'}">${doctor.is_active ? 'Active' : 'Inactive'}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary btn-sm" onclick="openEditDoctorModal(${doctor.id})">✏️ Edit</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteDoctor(${doctor.id})">🗑️ Delete</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function populateDepartmentDropdown() {
+            const select = document.getElementById('departmentId');
+            select.innerHTML = '<option value="">Select Department</option>';
+
+            departments.forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept.id;
+                option.textContent = dept.name;
+                select.appendChild(option);
+            });
+        }
+
+        function openAddDoctorModal() {
+            document.getElementById('modalTitle').textContent = 'Add Doctor';
+            document.getElementById('doctorForm').reset();
+            document.getElementById('doctorId').value = '';
+            document.getElementById('doctorModal').style.display = 'block';
+        }
+
+        function openEditDoctorModal(doctorId) {
+            const doctor = doctors.find(d => d.id === doctorId);
+            if (!doctor) return;
+
+            document.getElementById('modalTitle').textContent = 'Edit Doctor';
+            document.getElementById('doctorId').value = doctor.id;
+            document.getElementById('fullName').value = doctor.full_name;
+            document.getElementById('specialization').value = doctor.specialization;
+            document.getElementById('departmentId').value = doctor.department_id;
+            document.getElementById('availability').value = doctor.availability;
+            document.getElementById('isActive').value = doctor.is_active.toString();
+            document.getElementById('doctorModal').style.display = 'block';
+        }
+
+        function closeDoctorModal() {
+            document.getElementById('doctorModal').style.display = 'none';
+        }
+
+        async function handleDoctorSubmit(event) {
+            event.preventDefault();
+
+            const doctorId = document.getElementById('doctorId').value;
+            const doctorData = {
+                full_name: document.getElementById('fullName').value,
+                specialization: document.getElementById('specialization').value,
+                department_id: parseInt(document.getElementById('departmentId').value),
+                availability: document.getElementById('availability').value,
+                is_active: document.getElementById('isActive').value === 'true'
+            };
+
+            try {
+                const url = doctorId
+                    ? API_CONFIG.getApiUrl(`/api/admin/doctors/${doctorId}`)
+                    : API_CONFIG.getApiUrl('/api/admin/doctors');
+
+                const response = await fetch(url, {
+                    method: doctorId ? 'PUT' : 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(doctorData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(doctorId ? 'Doctor updated successfully!' : 'Doctor added successfully!');
+                    closeDoctorModal();
+                    fetchData();
+                } else {
+                    alert(data.message || 'Failed to save doctor');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to save doctor');
+            }
+        }
+
+        async function deleteDoctor(doctorId) {
+            if (!confirm('Are you sure you want to delete this doctor?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(API_CONFIG.getApiUrl(`/api/admin/doctors/${doctorId}`), {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Doctor deleted successfully!');
+                    fetchData();
+                } else {
+                    alert(data.message || 'Failed to delete doctor');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to delete doctor');
+            }
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('doctorModal');
+            if (event.target === modal) {
+                closeDoctorModal();
+            }
+        }
+
+        fetchData();
+    </script>
+</body>
+</html>

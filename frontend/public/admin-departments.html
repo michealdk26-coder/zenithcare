@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Departments - ZenithCare Hospital</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: #1a1a2e;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header h2 {
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-header p {
+            opacity: 0.7;
+            font-size: 0.875rem;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .sidebar-link {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .sidebar-link.active {
+            background: #007BFF;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #007BFF;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-success {
+            background: #28A745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .departments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .department-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .department-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .department-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: #007BFF;
+        }
+
+        .department-card p {
+            color: #666;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .department-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .stat {
+            flex: 1;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007BFF;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #666;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .close {
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007BFF;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 968px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .departments-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🏥 ZenithCare</h2>
+                <p>Admin Panel</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="admin-dashboard.html" class="sidebar-link">📊 Dashboard</a>
+                <a href="admin-appointments.html" class="sidebar-link">📅 Appointments</a>
+                <a href="admin-doctors.html" class="sidebar-link">👨‍⚕️ Doctors</a>
+                <a href="admin-departments.html" class="sidebar-link active">🏢 Departments</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="handleLogout()">🚪 Logout</button>
+            </div>
+        </aside>
+
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1>🏢 Departments Management</h1>
+                <button class="btn btn-primary" onclick="openAddDepartmentModal()">➕ Add Department</button>
+            </div>
+
+            <div id="loadingSection" class="loading">
+                <div class="spinner"></div>
+                <p>Loading departments...</p>
+            </div>
+
+            <div id="departmentsSection" style="display: none;">
+                <div class="departments-grid" id="departmentsGrid"></div>
+            </div>
+        </main>
+    </div>
+
+
+    <div id="departmentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Department</h2>
+                <span class="close" onclick="closeDepartmentModal()">&times;</span>
+            </div>
+            <form id="departmentForm" onsubmit="handleDepartmentSubmit(event)">
+                <input type="hidden" id="departmentId">
+
+                <div class="form-group">
+                    <label for="departmentName">Department Name *</label>
+                    <input type="text" id="departmentName" required placeholder="e.g., Cardiology">
+                </div>
+
+                <div class="form-group">
+                    <label for="departmentDescription">Description *</label>
+                    <textarea id="departmentDescription" required placeholder="Brief description of the department services"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeDepartmentModal()">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save Department</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const token = localStorage.getItem('zenithcare_token');
+        if (!token) {
+            window.location.href = 'admin-login.html';
+        }
+
+        let departments = [];
+        let departmentStats = {};
+
+        function handleLogout() {
+            localStorage.removeItem('zenithcare_token');
+            localStorage.removeItem('zenithcare_admin');
+            window.location.href = 'admin-login.html';
+        }
+
+        async function fetchData() {
+            try {
+                const [departmentsRes, doctorsRes, appointmentsRes] = await Promise.all([
+                    fetch(API_CONFIG.getApiUrl('/api/departments')),
+                    fetch(API_CONFIG.getApiUrl('/api/doctors')),
+                    fetch(API_CONFIG.getApiUrl('/api/admin/appointments'), {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    })
+                ]);
+
+                const departmentsData = await departmentsRes.json();
+                const doctorsData = await doctorsRes.json();
+                const appointmentsData = await appointmentsRes.json();
+
+                if (departmentsData.success) {
+                    departments = departmentsData.data;
+
+                    departments.forEach(dept => {
+                        const deptDoctors = doctorsData.success
+                            ? doctorsData.data.filter(d => d.department_id === dept.id)
+                            : [];
+
+                        const deptAppointments = appointmentsData.success
+                            ? appointmentsData.data.filter(a => a.department_id === dept.id)
+                            : [];
+
+                        departmentStats[dept.id] = {
+                            doctors: deptDoctors.length,
+                            appointments: deptAppointments.length
+                        };
+                    });
+
+                    displayDepartments(departments);
+                }
+
+                document.getElementById('loadingSection').style.display = 'none';
+                document.getElementById('departmentsSection').style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to fetch data');
+            }
+        }
+
+        function displayDepartments(departments) {
+            const grid = document.getElementById('departmentsGrid');
+            grid.innerHTML = '';
+
+            if (departments.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No departments yet</h3>
+                        <p>Click "Add Department" to create your first department</p>
+                    </div>
+                `;
+                return;
+            }
+
+            departments.forEach(dept => {
+                const stats = departmentStats[dept.id] || { doctors: 0, appointments: 0 };
+
+                const card = document.createElement('div');
+                card.className = 'department-card';
+                card.innerHTML = `
+                    <h3>${dept.name}</h3>
+                    <p>${dept.description}</p>
+
+                    <div class="department-stats">
+                        <div class="stat">
+                            <div class="stat-number">${stats.doctors}</div>
+                            <div class="stat-label">Doctors</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">${stats.appointments}</div>
+                            <div class="stat-label">Appointments</div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary btn-sm" onclick="openEditDepartmentModal(${dept.id})">✏️ Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteDepartment(${dept.id})">🗑️ Delete</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openAddDepartmentModal() {
+            document.getElementById('modalTitle').textContent = 'Add Department';
+            document.getElementById('departmentForm').reset();
+            document.getElementById('departmentId').value = '';
+            document.getElementById('departmentModal').style.display = 'block';
+        }
+
+        function openEditDepartmentModal(departmentId) {
+            const dept = departments.find(d => d.id === departmentId);
+            if (!dept) return;
+
+            document.getElementById('modalTitle').textContent = 'Edit Department';
+            document.getElementById('departmentId').value = dept.id;
+            document.getElementById('departmentName').value = dept.name;
+            document.getElementById('departmentDescription').value = dept.description;
+            document.getElementById('departmentModal').style.display = 'block';
+        }
+
+        function closeDepartmentModal() {
+            document.getElementById('departmentModal').style.display = 'none';
+        }
+
+        async function handleDepartmentSubmit(event) {
+            event.preventDefault();
+
+            const departmentId = document.getElementById('departmentId').value;
+            const departmentData = {
+                name: document.getElementById('departmentName').value,
+                description: document.getElementById('departmentDescription').value
+            };
+
+            try {
+                const url = departmentId
+                    ? API_CONFIG.getApiUrl(`/api/admin/departments/${departmentId}`)
+                    : API_CONFIG.getApiUrl('/api/admin/departments');
+
+                const response = await fetch(url, {
+                    method: departmentId ? 'PUT' : 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(departmentData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(departmentId ? 'Department updated successfully!' : 'Department added successfully!');
+                    closeDepartmentModal();
+                    fetchData();
+                } else {
+                    alert(data.message || 'Failed to save department');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to save department');
+            }
+        }
+
+        async function deleteDepartment(departmentId) {
+            const stats = departmentStats[departmentId];
+
+            if (stats && (stats.doctors > 0 || stats.appointments > 0)) {
+                alert(`Cannot delete department. It has ${stats.doctors} doctors and ${stats.appointments} appointments associated with it.`);
+                return;
+            }
+
+            if (!confirm('Are you sure you want to delete this department?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(API_CONFIG.getApiUrl(`/api/admin/departments/${departmentId}`), {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Department deleted successfully!');
+                    fetchData();
+                } else {
+                    alert(data.message || 'Failed to delete department');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to delete department');
+            }
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('departmentModal');
+            if (event.target === modal) {
+                closeDepartmentModal();
+            }
+        }
+
+        fetchData();
+    </script>
+</body>
+</html>

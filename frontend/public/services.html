@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Services - ZenithCare Hospital</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --primary-dark: #0b5ed7;
+            --secondary: #0dcaf0;
+            --bg-soft: #f5f7fb;
+        }
+
+        body {
+            font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+            background: #fff;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            color: var(--primary) !important;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #0d6efd 0%, #1c8dff 100%);
+            color: white;
+            padding: 4rem 0 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .service-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+            background: white;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .service-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            margin-bottom: 1rem;
+        }
+
+        .service-card h5 {
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.75rem;
+        }
+
+        .service-card p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .badge-count {
+            background: #e0f2fe;
+            color: var(--primary);
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .filter-pills {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .filter-pill {
+            border-radius: 999px;
+            padding: 0.5rem 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .stats-section {
+            background: var(--bg-soft);
+            padding: 3rem 0;
+            margin-top: 4rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .is-hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 3rem 0 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="bi bi-hospital-fill"></i> ZenithCare Hospital
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation" title="Toggle navigation menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="services.html">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="doctors.html">Doctors</a></li>
+                    <li class="nav-item"><a class="nav-link" href="appointment.html">Book Appointment</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="page-header">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold mb-3">Our Medical Services</h1>
+            <p class="lead mb-0">World-class healthcare across 24 specialized departments</p>
+        </div>
+    </div>
+
+
+    <div class="container mb-5">
+        <div id="loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3 text-muted">Loading departments...</p>
+        </div>
+
+        <div id="servicesGrid" class="row g-4 is-hidden"></div>
+    </div>
+
+
+    <div class="stats-section">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-3 col-6">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalDepartments">0</div>
+                        <div class="stat-label">Departments</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalDoctors">0</div>
+                        <div class="stat-label">Specialist Doctors</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-card">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Emergency Care</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-card">
+                        <div class="stat-number">30+</div>
+                        <div class="stat-label">Years Experience</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3"><i class="bi bi-hospital-fill"></i> ZenithCare Hospital</h5>
+                    <p class="text-light">Providing exceptional healthcare services with compassion and excellence since 1995.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h6 class="mb-3">Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="index.html" class="text-light text-decoration-none">Home</a></li>
+                        <li><a href="services.html" class="text-light text-decoration-none">Services</a></li>
+                        <li><a href="doctors.html" class="text-light text-decoration-none">Doctors</a></li>
+                        <li><a href="appointment.html" class="text-light text-decoration-none">Book Appointment</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h6 class="mb-3">Contact</h6>
+                    <p class="text-light mb-2"><i class="bi bi-telephone-fill"></i>08149355727</p>
+                    <p class="text-light mb-2"><i class="bi bi-envelope-fill"></i> michealdk26@gmail.com</p>
+                    <p class="text-light mb-2"><i class="bi bi-geo-alt-fill"></i>Ogbomoso, Oyo State</p>
+                </div>
+            </div>
+            <hr class="my-4 bg-secondary">
+            <p class="text-center text-light mb-0">&copy; 2026 ZenithCare Hospital. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="config.js"></script>
+    <script>
+        const API_URL = API_CONFIG.getApiUrl('/api');
+
+        const departmentIcons = {
+            'Cardiology': 'bi-heart-pulse',
+            'Neurology': 'bi-brain',
+            'Pediatrics': 'bi-person-hearts',
+            'Orthopedics': 'bi-bandaid',
+            'Emergency Medicine': 'bi-hospital',
+            'Oncology': 'bi-shield-plus',
+            'Radiology': 'bi-radioactive',
+            'Internal Medicine': 'bi-clipboard2-pulse',
+            'Surgery': 'bi-scissors',
+            'Obstetrics & Gynecology': 'bi-person-standing',
+            'Psychiatry': 'bi-chat-heart',
+            'Dermatology': 'bi-droplet',
+            'Ophthalmology': 'bi-eye',
+            'ENT (Otolaryngology)': 'bi-headphones',
+            'Urology': 'bi-clipboard-data',
+            'Gastroenterology': 'bi-capsule',
+            'Pulmonology': 'bi-lungs',
+            'Nephrology': 'bi-droplet-half',
+            'Endocrinology': 'bi-thermometer-half',
+            'Rheumatology': 'bi-graph-up',
+            'Anesthesiology': 'bi-file-medical',
+            'Pathology': 'bi-microscope',
+            'Physical Medicine & Rehabilitation': 'bi-activity',
+            'Hematology': 'bi-heart-half'
+        };
+
+        async function loadServices() {
+            try {
+                const [departmentsRes, doctorsRes] = await Promise.all([
+                    fetch(`${API_URL}/departments`),
+                    fetch(`${API_URL}/doctors`)
+                ]);
+
+                const departmentsData = await departmentsRes.json();
+                const doctorsData = await doctorsRes.json();
+
+                if (departmentsData.success && doctorsData.success) {
+                    const departments = departmentsData.data;
+                    const doctors = doctorsData.data;
+
+                    const doctorCounts = {};
+                    doctors.forEach(doctor => {
+                        doctorCounts[doctor.department_id] = (doctorCounts[doctor.department_id] || 0) + 1;
+                    });
+
+                    displayServices(departments, doctorCounts);
+                    updateStats(departments.length, doctors.length);
+                }
+            } catch (error) {
+                console.error('Error loading services:', error);
+                document.getElementById('loading').innerHTML =
+                    '<div class="alert alert-danger">Failed to load services. Please try again later.</div>';
+            }
+        }
+
+        function displayServices(departments, doctorCounts) {
+            const grid = document.getElementById('servicesGrid');
+            grid.innerHTML = '';
+
+            departments.forEach(dept => {
+                const doctorCount = doctorCounts[dept.id] || 0;
+                const icon = departmentIcons[dept.name] || 'bi-hospital';
+
+                const col = document.createElement('div');
+                col.className = 'col-md-6 col-lg-4';
+                col.innerHTML = `
+                    <div class="service-card p-4">
+                        <div class="service-icon">
+                            <i class="bi ${icon}"></i>
+                        </div>
+                        <h5>${dept.name}</h5>
+                        <p class="mb-3">${dept.description}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge-count">
+                                <i class="bi bi-people-fill"></i> ${doctorCount} Specialist${doctorCount !== 1 ? 's' : ''}
+                            </span>
+                            <a href="appointment.html" class="btn btn-sm btn-primary">Book Now</a>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(col);
+            });
+
+            document.getElementById('loading').classList.add('is-hidden');
+            grid.classList.remove('is-hidden');
+        }
+
+        function updateStats(deptCount, doctorCount) {
+            document.getElementById('totalDepartments').textContent = deptCount;
+            document.getElementById('totalDoctors').textContent = doctorCount;
+        }
+
+        loadServices();
+    </script>
+
+
+    <script src="chat-widget.js"></script>
+</body>
+</html>

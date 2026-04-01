@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZenithCare Hospital | World-Class Healthcare</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
+        <div class="container py-2">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+                <i class="bi bi-hospital-fill fs-3"></i> ZenithCare Hospital
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+                    <li class="nav-item"><a class="nav-link active" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="services.html">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="doctors.html">Doctors</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="admin-login.html">Admin</a></li>
+                    <li class="nav-item ms-lg-2"><a class="btn btn-primary btn-appointment" href="appointment.html">Book Appointment</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <section id="home" class="hero-section py-5 py-lg-6">
+        <div class="hero-blob"></div>
+        <div class="container position-relative">
+            <div class="row align-items-center g-4 g-lg-5">
+                <div class="col-lg-6" data-aos="fade-right" data-aos-duration="1000">
+                    <span class="badge bg-light text-primary mb-3 fw-semibold">🏆 Serving 50,000+ patients annually</span>
+                    <h1 class="display-5 fw-bold mb-3">Welcome to <span class="text-warning">ZenithCare</span> Hospital</h1>
+                    <p class="lead mb-4 opacity-90">A world-class medical facility with 24 specialized departments and 115+ expert physicians. Your health is our priority.</p>
+                    <div class="d-flex flex-wrap gap-3 mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-check-circle-fill fs-5"></i>
+                            <span>24 Medical Departments</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-check-circle-fill fs-5"></i>
+                            <span>115+ Expert Doctors</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-check-circle-fill fs-5"></i>
+                            <span>24/7 Emergency</span>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="appointment.html" class="btn btn-light btn-lg fw-bold px-4">Book Appointment</a>
+                        <a href="services.html" class="btn btn-outline-light btn-lg fw-bold px-4">Our Services</a>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center" data-aos="fade-left" data-aos-duration="1000">
+                    <img src="https://images.unsplash.com/photo-1504439468489-c8920d796a29?auto=format&fit=crop&w=1200&q=80" alt="Hospital building" class="img-fluid hero-img" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="py-4 gradient-primary">
+        <div class="container">
+            <div class="row g-3 text-center text-white">
+                <div class="col-6 col-lg-3" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="stat-card">
+                        <div class="stat-number" data-count="50000">0</div>
+                        <div class="stat-label">Patients Treated Annually</div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="stat-card">
+                        <div class="stat-number" data-count="115">0</div>
+                        <div class="stat-label">Expert Doctors</div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="stat-card">
+                        <div class="stat-number" data-count="24">0</div>
+                        <div class="stat-label">Medical Departments</div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3" data-aos="zoom-in" data-aos-delay="400">
+                    <div class="stat-card">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Emergency Support</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section id="services" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <h2 class="section-title">Our Medical Services</h2>
+                <p class="section-subtitle fs-5">Comprehensive healthcare solutions for you and your family</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="service-card h-100 border border-2 border-primary-subtle">
+                        <div class="service-icon"><i class="bi bi-hospital-fill"></i></div>
+                        <h5 class="fw-bold">Emergency Care</h5>
+                        <p class="text-muted mb-0">24/7 rapid response teams ready to handle critical situations and save lives.</p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="service-card h-100">
+                        <div class="service-icon"><i class="bi bi-heart-pulse-fill"></i></div>
+                        <h5 class="fw-bold">Consultation</h5>
+                        <p class="text-muted mb-0">Expert medical consultations with 102+ experienced specialist doctors.</p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="service-card h-100">
+                        <div class="service-icon icon-purple"><i class="bi bi-scissors"></i></div>
+                        <h5 class="fw-bold">Surgery</h5>
+                        <p class="text-muted mb-0">Advanced surgical procedures with state-of-the-art technology and equipment.</p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="service-card h-100">
+                        <div class="service-icon"><i class="bi bi-shield-plus"></i></div>
+                        <h5 class="fw-bold">Laboratory</h5>
+                        <p class="text-muted mb-0">Comprehensive diagnostic testing with accurate and timely results.</p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="service-card h-100">
+                        <div class="service-icon"><i class="bi bi-heart-pulse-fill"></i></div>
+                        <h5 class="fw-bold">Cardiology</h5>
+                        <p class="text-muted mb-0">Specialized heart and cardiovascular disease treatment and care.</p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="service-card h-100">
+                        <div class="service-icon icon-blue"><i class="bi bi-radioactive"></i></div>
+                        <h5 class="fw-bold">Radiology</h5>
+                        <p class="text-muted mb-0">Advanced imaging services including X-ray, CT, MRI, and ultrasound.</p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="service-card h-100">
+                        <div class="service-icon icon-purple"><i class="bi bi-person-hearts"></i></div>
+                        <h5 class="fw-bold">Pediatrics</h5>
+                        <p class="text-muted mb-0">Comprehensive medical care for infants, children, and adolescents.</p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="service-card h-100">
+                        <div class="service-icon icon-green"><i class="bi bi-shield-plus"></i></div>
+                        <h5 class="fw-bold">Oncology</h5>
+                        <p class="text-muted mb-0">Complete cancer diagnosis, treatment, and compassionate patient care.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <a href="services.html" class="btn btn-primary btn-lg">View All 24 Departments →</a>
+            </div>
+        </div>
+    </section>
+
+
+    <section id="doctors" class="py-5 bg-white">
+        <div class="container">
+            <div class="text-center mb-4" data-aos="fade-up">
+                <h2 class="section-title">Meet Our Expert Doctors</h2>
+                <p class="section-subtitle fs-5">102+ board-certified specialists across 24 departments</p>
+            </div>
+
+            <div id="doctorLoading" class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">Loading our doctors...</p>
+            </div>
+
+            <div class="row g-4 is-hidden" id="doctorGrid"></div>
+
+            <div class="text-center mt-4">
+                <a href="doctors.html" class="btn btn-outline-primary btn-lg px-4">View All 102 Doctors →</a>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <h2 class="section-title">What Our Patients Say</h2>
+                <p class="section-subtitle fs-5">Real experiences from people we've helped</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-12 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="testimonial-card h-100">
+                        <div class="text-warning mb-2">★★★★★</div>
+                        <p class="mb-4 text-muted">"The care I received at ZenithCare was exceptional. The doctors were attentive and the staff made me feel comfortable throughout my treatment."</p>
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80" class="rounded-circle" width="48" height="48" alt="Jennifer" />
+                            <div>
+                                <h6 class="mb-0 fw-bold">Jennifer Smith</h6>
+                                <small class="text-muted">Patient</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="testimonial-card h-100">
+                        <div class="text-warning mb-2">★★★★★</div>
+                        <p class="mb-4 text-muted">"Professional, caring, and efficient. ZenithCare exceeded all my expectations. I highly recommend their services."</p>
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=120&q=80" class="rounded-circle" width="48" height="48" alt="David" />
+                            <div>
+                                <h6 class="mb-0 fw-bold">David Thompson</h6>
+                                <small class="text-muted">Patient</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="testimonial-card h-100">
+                        <div class="text-warning mb-2">★★★★★</div>
+                        <p class="mb-4 text-muted">"From the moment I walked in, I felt taken care of. The medical team is top-notch and the facilities are state-of-the-art."</p>
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" class="rounded-circle" width="48" height="48" alt="Mark" />
+                            <div>
+                                <h6 class="mb-0 fw-bold">Elliot Zuckerberg</h6>
+                                <small class="text-muted">Patient</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section id="contact" class="py-5 bg-white">
+        <div class="container">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <h2 class="section-title">Get In Touch</h2>
+                <p class="section-subtitle fs-5">We're here to answer your questions and schedule your appointment</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-12 col-lg-6" data-aos="fade-right" data-aos-delay="100">
+                    <div class="card contact-card p-4">
+                        <form id="contactForm">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Full Name</label>
+                                <input type="text" class="form-control form-control-lg" id="contactName" placeholder="Enter your full name" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Email Address</label>
+                                <input type="email" class="form-control form-control-lg" id="contactEmail" placeholder="Enter your email address" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Phone Number</label>
+                                <input type="tel" class="form-control form-control-lg" id="contactPhone" placeholder="Enter your phone number" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Message</label>
+                                <textarea class="form-control form-control-lg" id="contactMessage" rows="4" placeholder="Your message..." required></textarea>
+                            </div>
+                            <div id="contactAlert" class="alert d-none" role="alert"></div>
+                            <button type="submit" class="btn btn-primary btn-lg w-100" id="contactSubmitBtn">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6" data-aos="fade-left" data-aos-delay="200">
+                    <div class="card contact-card p-4 h-100">
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <div class="text-primary fs-3"><i class="bi bi-geo-alt-fill"></i></div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Address</h6>
+                                <p class="text-muted mb-0">Ogbomoso, Oyo State</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <div class="text-primary fs-3"><i class="bi bi-telephone-fill"></i></div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Phone</h6>
+                                <p class="text-muted mb-0">08149355727</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <div class="text-primary fs-3"><i class="bi bi-envelope-fill"></i></div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Email</h6>
+                                <p class="text-muted mb-0">michealdk26@gmail.com</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="text-primary fs-3"><i class="bi bi-clock-history"></i></div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Working Hours</h6>
+                                <p class="text-muted mb-0">24/7 Emergency Services<br>Mon-Fri: 8:00 AM - 8:00 PM<br>Sat-Sun: 9:00 AM - 5:00 PM</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <footer class="footer py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-12 col-lg-4">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <i class="bi bi-hospital-fill fs-3 text-primary"></i>
+                        <h5 class="mb-0 text-white">ZenithCare Hospital</h5>
+                    </div>
+                    <p class="text-light">Providing exceptional healthcare services with compassion and excellence since 1995.</p>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6 class="text-white mb-3">Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#home">Home</a></li>
+                        <li class="mb-2"><a href="#services">Services</a></li>
+                        <li class="mb-2"><a href="#doctors">Doctors</a></li>
+                        <li class="mb-2"><a href="appointment.html">Appointments</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6 class="text-white mb-3">Departments</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">Cardiology</li>
+                        <li class="mb-2">Neurology</li>
+                        <li class="mb-2">Pediatrics</li>
+                        <li class="mb-2">Orthopedics</li>
+                    </ul>
+                </div>
+                <div class="col-12 col-lg-4">
+                    <h6 class="text-white mb-3">Follow Us</h6>
+                    <div class="d-flex gap-3">
+                        <a href="https://www.facebook.com/share/1AdiC5AmsK/" target="_blank" rel="noopener" aria-label="Facebook" class="fs-4"><i class="bi bi-facebook"></i></a>
+                        <a href="https://x.com/dk_micheal2008" target="_blank" rel="noopener" aria-label="X (Twitter)" class="fs-4"><i class="bi bi-twitter"></i></a>
+                        <a href="https://www.instagram.com/dev_chukwuka/" target="_blank" rel="noopener" aria-label="Instagram" class="fs-4"><i class="bi bi-instagram"></i></a>
+                        <a href="https://www.linkedin.com/in/micheal-dike-571527374/" target="_blank" rel="noopener" aria-label="LinkedIn" class="fs-4"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="pt-4 mt-4 border-top border-secondary text-center medium text-light">
+                © 2026 ZenithCare Hospital. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="config.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true,
+            offset: 100
+        });
+
+        function animateCounter(element) {
+            const target = parseInt(element.getAttribute('data-count'));
+            const duration = 2000;
+            const increment = target / (duration / 16);
+            let current = 0;
+
+            const updateCounter = () => {
+                current += increment;
+                if (current < target) {
+                    element.textContent = Math.floor(current).toLocaleString() + '+';
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    element.textContent = target.toLocaleString() + '+';
+                }
+            };
+
+            updateCounter();
+        }
+
+        const observerOptions = {
+            threshold: 0.5,
+            rootMargin: '0px'
+        };
+
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counters = entry.target.querySelectorAll('.stat-number[data-count]');
+                    counters.forEach(counter => {
+                        if (!counter.classList.contains('counted')) {
+                            animateCounter(counter);
+                            counter.classList.add('counted');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const statsSection = document.querySelector('.gradient-primary');
+            if (statsSection) {
+                statsObserver.observe(statsSection);
+            }
+        });
+
+        const doctorImages = [
+            'https://images.unsplash.com/photo-1550831107-1553da8c8464?auto=format&fit=crop&w=400&q=80', // Dermatopathologist (doctor in lab coat)
+            'https://images.unsplash.com/photo-1527613426441-4da17471b66d?auto=format&fit=crop&w=400&q=80', // Pediatric Nephrologist (doctor in lab coat with child)
+            'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=400&q=80', // Doctor in lab coat, face visible, healthcare setting
+            'https://images.unsplash.com/photo-1520880867055-1e30d1cb001c?auto=format&fit=crop&w=400&q=80', // Gynecologic Oncologist (doctor in lab coat)
+            'https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?auto=format&fit=crop&w=400&q=80', // Hematology-Oncology (doctor in lab coat)
+            'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80', // Doctor in lab coat
+            'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80', // Doctor in lab coat
+            'https://images.unsplash.com/photo-1521737852567-6949f3f9f2b5?auto=format&fit=crop&w=400&q=80', // Doctor in lab coat
+            'https://images.unsplash.com/photo-1519821172143-ecb1df1a9b1b?auto=format&fit=crop&w=400&q=80'  // Doctor in lab coat
+        ];
+
+        function createDoctorFallbackImage(name) {
+            const initials = (name || 'Doctor')
+                .split(' ')
+                .filter(Boolean)
+                .slice(0, 2)
+                .map(part => part[0].toUpperCase())
+                .join('');
+
+            const svg = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500">
+                    <defs>
+                        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#0d6efd"/>
+                            <stop offset="100%" stop-color="#6f42c1"/>
+                        </linearGradient>
+                    </defs>
+                    <rect width="500" height="500" fill="url(#bg)"/>
+                    <circle cx="250" cy="195" r="90" fill="#ffffff" opacity="0.95"/>
+                    <rect x="150" y="290" width="200" height="140" rx="70" fill="#ffffff" opacity="0.95"/>
+                    <text x="250" y="220" font-size="70" text-anchor="middle">👨‍⚕️</text>
+                    <text x="250" y="470" font-size="44" font-family="Arial, sans-serif" font-weight="700" fill="#ffffff" text-anchor="middle">${initials || 'DR'}</text>
+                </svg>
+            `;
+
+            return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+        }
+
+        async function loadDoctors() {
+            try {
+                const response = await fetch(API_CONFIG.getApiUrl('/api/doctors'));
+                const data = await response.json();
+
+                if (data.success && data.data.length > 0) {
+                    displayDoctors(data.data.slice(0, 8)); // Show first 8 doctors
+                } else {
+                    document.getElementById('doctorLoading').innerHTML =
+                        '<p class="text-muted">No doctors available at the moment.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading doctors:', error);
+                document.getElementById('doctorLoading').innerHTML =
+                    '<p class="text-danger">Unable to load doctors. Please try again later.</p>';
+            }
+        }
+
+        function displayDoctors(doctors) {
+            const grid = document.getElementById('doctorGrid');
+            const loading = document.getElementById('doctorLoading');
+
+            grid.innerHTML = '';
+
+            doctors.forEach((doctor, index) => {
+                const col = document.createElement('div');
+                col.className = 'col-12 col-sm-6 col-md-4 col-lg-3';
+                col.setAttribute('data-aos', 'fade-up');
+                col.setAttribute('data-aos-delay', (index * 100).toString());
+
+                const imageUrl = doctorImages[index % doctorImages.length];
+                const fallbackImage = createDoctorFallbackImage(doctor.full_name);
+
+                col.innerHTML = `
+                    <div class="card doctor-card h-100 border-0">
+                        <img src="${imageUrl}" class="card-img-top img-fluid" alt="${doctor.full_name}" style="height: 250px; width: 100%; object-fit: cover; border-radius: 10px 10px 0 0;" onerror="this.onerror=null;this.src='${fallbackImage}';">
+                        <div class="card-body text-center">
+                            <h5 class="card-title fw-bold mb-2" style="font-size: 1.1rem;">${doctor.full_name}</h5>
+                            <p class="text-primary fw-semibold mb-1" style="font-size: 0.95rem;">${doctor.specialization}</p>
+                            <p class="text-muted mb-2" style="font-size: 0.85rem;">
+                                <i class="bi bi-hospital"></i> ${doctor.department?.name || 'N/A'}
+                            </p>
+                            <div class="mb-3">
+                                <span class="badge ${doctor.is_active ? 'bg-success' : 'bg-secondary'}" style="font-size: 0.75rem;">
+                                    ${doctor.is_active ? '✓ Available' : 'Not Available'}
+                                </span>
+                            </div>
+                            <a href="appointment.html" class="btn btn-primary btn-sm w-100" style="font-size: 0.85rem;">
+                                <i class="bi bi-calendar-check"></i> Book Now
+                            </a>
+                        </div>
+                    </div>
+                `;
+
+                grid.appendChild(col);
+            });
+
+            loading.classList.add('is-hidden');
+            grid.classList.remove('is-hidden');
+
+            AOS.refresh();
+        }
+
+        document.addEventListener('DOMContentLoaded', loadDoctors);
+    </script>
+
+
+    <script src="chat-widget.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const contactForm = document.getElementById('contactForm');
+        if (contactForm) {
+            contactForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const name = document.getElementById('contactName').value.trim();
+                const email = document.getElementById('contactEmail').value.trim();
+                const phone = document.getElementById('contactPhone').value.trim();
+                const message = document.getElementById('contactMessage').value.trim();
+                const alertBox = document.getElementById('contactAlert');
+                const submitBtn = document.getElementById('contactSubmitBtn');
+                alertBox.classList.add('d-none');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Sending...';
+                try {
+                    const contactApiUrl = (window.API_CONFIG && typeof window.API_CONFIG.getApiUrl === 'function')
+                        ? window.API_CONFIG.getApiUrl('/api/contact')
+                        : '/api/contact';
+
+                    const response = await fetch(contactApiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email, phone, message })
+                    });
+                    const data = await response.json().catch(() => ({}));
+                    if (response.ok && data.success) {
+                        alertBox.className = 'alert alert-success';
+                        alertBox.textContent = 'Message sent successfully!';
+                        contactForm.reset();
+                    } else {
+                        alertBox.className = 'alert alert-danger';
+                        alertBox.textContent = data.message || 'Failed to send message.';
+                    }
+                } catch (err) {
+                    alertBox.className = 'alert alert-danger';
+                    alertBox.textContent = 'Failed to send message. Please try again later.';
+                } finally {
+                    alertBox.classList.remove('d-none');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Send Message';
+                }
+            });
+        }
+    });
+    </script>
+</body>
+</html>

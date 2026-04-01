@@ -1,0 +1,10 @@
+{
+  "name": "zenithcare-frontend",
+  "version": "1.0.0",
+  "description": "ZenithCare Hospital - Pure HTML/CSS/JavaScript Frontend",
+  "private": true,
+  "scripts": {
+    "start": "cd public && python3 -m http.server 3000",
+    "serve": "cd public && npx http-server -p 3000 -o"
+  }
+}

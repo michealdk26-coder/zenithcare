@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Appointments - ZenithCare Hospital</title>
+    <link rel="stylesheet" href="admin-appointments.css">
+</head>
+<body>
+    <div class="admin-layout">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🏥 ZenithCare</h2>
+                <p>Admin Panel</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="admin-dashboard.html" class="sidebar-link">📊 Dashboard</a>
+                <a href="admin-appointments.html" class="sidebar-link active">📅 Appointments</a>
+                <a href="admin-doctors.html" class="sidebar-link">👨‍⚕️ Doctors</a>
+                <a href="admin-departments.html" class="sidebar-link">🏢 Departments</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="handleLogout()">🚪 Logout</button>
+            </div>
+        </aside>
+
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1>📅 Appointments Management</h1>
+            </div>
+
+
+            <div class="filter-bar">
+                <select id="statusFilter" onchange="filterAppointments()" aria-label="Filter appointments by status">
+                    <option value="">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+            </div>
+
+            <div id="loadingSection" class="loading">
+                <div class="spinner"></div>
+                <p>Loading appointments...</p>
+            </div>
+
+            <div id="appointmentsSection" class="section-card hidden">
+                <div class="table-container">
+                    <table id="appointmentsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Patient</th>
+                                <th>Contact</th>
+                                <th>Department</th>
+                                <th>Doctor</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const token = localStorage.getItem('zenithcare_token');
+        if (!token) {
+            window.location.href = 'admin-login.html';
+        }
+
+        let allAppointments = [];
+
+        function handleLogout() {
+            localStorage.removeItem('zenithcare_token');
+            localStorage.removeItem('zenithcare_admin');
+            window.location.href = 'admin-login.html';
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        async function fetchAppointments() {
+            try {
+                const response = await fetch(API_CONFIG.getApiUrl('/api/admin/appointments'), {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    allAppointments = data.data;
+                    displayAppointments(allAppointments);
+                    document.getElementById('loadingSection').classList.add('hidden');
+                    document.getElementById('appointmentsSection').classList.remove('hidden');
+                } else {
+                    alert('Failed to fetch appointments');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to fetch appointments');
+            }
+        }
+
+        function displayAppointments(appointments) {
+            const tbody = document.querySelector('#appointmentsTable tbody');
+            tbody.innerHTML = '';
+
+            if (appointments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No appointments found</td></tr>';
+                return;
+            }
+
+            appointments.forEach(appointment => {
+                const row = document.createElement('tr');
+                const isPending = appointment.status === 'Pending';
+
+                row.innerHTML = `
+                    <td>#${appointment.id}</td>
+                    <td>${appointment.patient_name}</td>
+                    <td>
+                        ${appointment.phone}<br>
+                        <small>${appointment.email || 'No email provided'}</small>
+                    </td>
+                    <td>${appointment.department?.name || 'N/A'}</td>
+                    <td>${appointment.doctor?.full_name || 'Not assigned'}</td>
+                    <td>${formatDate(appointment.appointment_date)}</td>
+                    <td><span class="status-badge ${appointment.status.toLowerCase()}">${appointment.status}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button
+                                class="btn btn-approve"
+                                onclick="updateStatus(${appointment.id}, 'Approved')"
+                                ${!isPending ? 'disabled' : ''}
+                            >
+                                ✅ Approve
+                            </button>
+                            <button
+                                class="btn btn-reject"
+                                onclick="updateStatus(${appointment.id}, 'Rejected')"
+                                ${!isPending ? 'disabled' : ''}
+                            >
+                                ❌ Reject
+                            </button>
+                            <button
+                                class="btn"
+                                style="background:#dc3545;color:#fff;"
+                                onclick="deleteAppointment(${appointment.id})"
+                            >
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function filterAppointments() {
+            const status = document.getElementById('statusFilter').value;
+
+            if (status === '') {
+                displayAppointments(allAppointments);
+            } else {
+                const filtered = allAppointments.filter(a => a.status === status);
+                displayAppointments(filtered);
+            }
+        }
+
+        async function updateStatus(appointmentId, newStatus) {
+            if (!confirm(`Are you sure you want to ${newStatus.toLowerCase()} this appointment?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(API_CONFIG.getApiUrl(`/api/admin/appointments/${appointmentId}`), {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(`Appointment ${newStatus.toLowerCase()} successfully!${data.emailSent ? ' Email notification sent.' : ' Email notification not sent.'}`);
+                    fetchAppointments(); // Reload appointments
+                } else {
+                    alert(data.message || 'Failed to update appointment');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to update appointment');
+            }
+        }
+
+        async function deleteAppointment(appointmentId) {
+            if (!confirm('Are you sure you want to delete this appointment? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(API_CONFIG.getApiUrl(`/api/admin/appointments/${appointmentId}`), {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Appointment deleted successfully!');
+                    fetchAppointments();
+                } else {
+                    alert(data.message || 'Failed to delete appointment');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to delete appointment');
+            }
+        }
+
+        fetchAppointments();
+    </script>
+</body>
+</html>
