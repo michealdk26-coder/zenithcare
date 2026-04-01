@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: zenithcare-hospital
+    env: node
+    plan: free
+    buildCommand: npm install --prefix backend
+    startCommand: npm --prefix backend start
+    autoDeploy: true
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: GMAIL_USER
+        sync: false
+      - key: GMAIL_PASS
+        sync: false
+      - key: FALLBACK_ADMIN_EMAIL
+        sync: false
+      - key: FALLBACK_ADMIN_PASSWORD
+        sync: false

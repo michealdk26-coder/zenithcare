@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const appointmentRoutes = require('./routes/appointment.routes');
 const contactRoutes = require('./routes/contact.routes');
 const authRoutes = require('./routes/auth.routes');
@@ -10,12 +11,13 @@ const doctorRoutes = require('./routes/doctor.routes');
 const departmentRoutes = require('./routes/department.routes');
 
 const app = express();
+const frontendPath = path.join(__dirname, '../../frontend/public');
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
   res.status(200).json({
     success: true,
     message: 'Welcome to ZenithCare Hospital API',
@@ -65,6 +67,16 @@ app.use('/api/admin', adminDoctorRoutes);
 app.use('/api/admin', adminDepartmentRoutes);
 app.use('/api', doctorRoutes);
 app.use('/api', departmentRoutes);
+
+app.use(express.static(frontendPath));
+
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api') || req.path === '/health') {
+    return next();
+  }
+
+  return res.sendFile(path.join(frontendPath, 'index.html'));
+});
 
 app.use((req, res) => {
   res.status(404).json({
