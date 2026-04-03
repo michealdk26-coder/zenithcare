@@ -73,6 +73,42 @@ const sendAppointmentStatusEmail = async ({
   }
 };
 
+const sendContactFormEmail = async ({
+  name,
+  email,
+  phone,
+  message
+}) => {
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.warn('Contact email not sent: GMAIL_USER/GMAIL_PASS not configured.');
+    return { sent: false, reason: 'Email config missing' };
+  }
+
+  const mailOptions = {
+    from: process.env.GMAIL_USER,
+    to: process.env.GMAIL_USER,
+    subject: `New Contact Form Submission from ${name}`,
+    text: [
+      `Name: ${name}`,
+      `Email: ${email}`,
+      `Phone: ${phone || 'N/A'}`,
+      '',
+      'Message:',
+      message
+    ].join('\n')
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return { sent: true };
+  } catch (error) {
+    console.error('Failed to send contact form email:', error.message);
+    return { sent: false, reason: error.message };
+  }
+};
+
 module.exports = {
-  sendAppointmentStatusEmail
+  sendAppointmentStatusEmail,
+  sendContactFormEmail
 };

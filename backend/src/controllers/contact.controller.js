@@ -1,22 +1,14 @@
-const nodemailer = require('nodemailer');
-require('dotenv').config();
+const { sendContactFormEmail } = require('../services/email.service');
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS
-  }
-});
+const EMAIL_TIMEOUT_MS = 12000;
 
-async function sendContactEmail({ name, email, phone, message }) {
-  const mailOptions = {
-    from: process.env.GMAIL_USER,
-    to: process.env.GMAIL_USER,
-    subject: `New Contact Form Submission from ${name}`,
-    text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nMessage: ${message}`
-  };
-  await transporter.sendMail(mailOptions);
+async function sendContactEmail(payload) {
+  const emailPromise = sendContactFormEmail(payload);
+  const timeoutPromise = new Promise((resolve) => {
+    setTimeout(() => resolve({ sent: false, reason: 'Email request timed out' }), EMAIL_TIMEOUT_MS);
+  });
+
+  return Promise.race([emailPromise, timeoutPromise]);
 }
 
 module.exports = { sendContactEmail };
