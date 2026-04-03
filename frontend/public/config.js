@@ -15,7 +15,8 @@ const API_CONFIG = {
             return 'http://localhost:5000';
         }
 
-        return window.location.origin;
+        // Production: use Render backend
+        return 'https://zenithcare-pgzb.onrender.com';
     },
 
     BASE_URL: '',
