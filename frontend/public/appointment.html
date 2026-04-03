@@ -16,7 +16,6 @@
                 <li><a href="doctors.html" class="nav-link">Doctors</a></li>
                 <li><a href="appointment.html" class="nav-link">Book Appointment</a></li>
                 <li><a href="contact.html" class="nav-link">Contact</a></li>
-                <li><a href="admin-login.html" class="nav-link admin-link">Admin</a></li>
             </ul>
             <div class="hamburger" id="hamburger">
                 <span></span>
@@ -108,6 +107,7 @@
     </footer>
 
     <script src="config.js"></script>
+    <script src="fallback-data.js"></script>
     <script>
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('navMenu');
@@ -131,6 +131,7 @@
 
         const urlDoctorId = getUrlParameter('doctor_id');
         const urlDepartmentId = getUrlParameter('department_id');
+        let hasAppliedUrlSelection = false;
 
         console.log('URL Parameters - Doctor ID:', urlDoctorId, 'Department ID:', urlDepartmentId);
 
@@ -151,23 +152,24 @@
 
                 if (doctorData.success) {
                     doctors = doctorData.data;
-
-                    if (urlDoctorId) {
-                        setTimeout(() => {
-                            const doctorSelect = document.getElementById('doctor_id');
-                            doctorSelect.value = String(urlDoctorId);
-                            console.log('Set doctor from URL to:', doctorSelect.value);
-                        }, 150);
-                    }
                 }
+
+                applyUrlDoctorSelection();
 
             } catch (error) {
                 console.error('Error fetching data:', error);
+                departments = window.PUBLIC_FALLBACK_DEPARTMENTS || [];
+                doctors = window.PUBLIC_FALLBACK_DOCTORS || [];
+
+                populateDepartments();
+                applyUrlDoctorSelection();
             }
         }
 
         function populateDepartments() {
             const departmentSelect = document.getElementById('department_id');
+            departmentSelect.innerHTML = '<option value="">Select a department</option>';
+
             departments.forEach(dept => {
                 const option = document.createElement('option');
                 option.value = String(dept.id);  // Ensure value is a string
@@ -175,35 +177,132 @@
                 departmentSelect.appendChild(option);
             });
             console.log('Departments populated:', departments.length);
+        }
 
-            if (urlDepartmentId) {
-                setTimeout(() => {
-                    departmentSelect.value = String(urlDepartmentId);
-                    console.log('Set department from URL to:', departmentSelect.value);
-                    departmentSelect.dispatchEvent(new Event('change'));
-                }, 50);
+        function populateDoctorsByDepartment(departmentId, selectedDoctorId = null) {
+            const normalizedDepartmentId = Number(departmentId);
+            const doctorSelect = document.getElementById('doctor_id');
+            const doctorHint = document.getElementById('doctorHint');
+
+            doctorSelect.innerHTML = '<option value="">Any available doctor</option>';
+
+            if (!normalizedDepartmentId) {
+                doctorHint.textContent = 'Select a department first';
+                doctorSelect.value = '';
+                return;
+            }
+
+            const filteredDoctors = doctors.filter(doc =>
+                Number(doc.department_id) === normalizedDepartmentId && doc.is_active
+            );
+
+            filteredDoctors.forEach(doctor => {
+                const option = document.createElement('option');
+                option.value = String(doctor.id);
+                option.textContent = `${doctor.full_name} - ${doctor.specialization}`;
+                doctorSelect.appendChild(option);
+            });
+
+            if (selectedDoctorId) {
+                doctorSelect.value = String(selectedDoctorId);
+            }
+
+            doctorHint.textContent = filteredDoctors.length > 0
+                ? 'Choose a preferred doctor or keep "Any available doctor"'
+                : 'No active doctors in this department right now';
+        }
+
+        function applyUrlDoctorSelection() {
+            if (hasAppliedUrlSelection || !urlDoctorId || departments.length === 0 || doctors.length === 0) {
+                return;
+            }
+
+            const departmentSelect = document.getElementById('department_id');
+            const doctorFromUrl = doctors.find((doc) => String(doc.id) === String(urlDoctorId));
+            const inferredDepartmentId = doctorFromUrl ? String(doctorFromUrl.department_id) : '';
+            const targetDepartmentId = urlDepartmentId ? String(urlDepartmentId) : inferredDepartmentId;
+
+            if (targetDepartmentId) {
+                departmentSelect.value = targetDepartmentId;
+                populateDoctorsByDepartment(targetDepartmentId, urlDoctorId);
+                console.log('Applied URL selection. Department:', targetDepartmentId, 'Doctor:', urlDoctorId);
+            }
+
+            hasAppliedUrlSelection = true;
+
+            if (window.history && window.history.replaceState) {
+                const cleanUrl = `${window.location.pathname}`;
+                window.history.replaceState({}, document.title, cleanUrl);
             }
         }
 
         document.getElementById('department_id').addEventListener('change', function() {
-            const departmentId = parseInt(this.value);
-            const doctorSelect = document.getElementById('doctor_id');
-
-            doctorSelect.innerHTML = '<option value="">Any available doctor</option>';
-
-            if (departmentId) {
-                const filteredDoctors = doctors.filter(doc =>
-                    Number(doc.department_id) === Number(departmentId) && doc.is_active
-                );
-
-                filteredDoctors.forEach(doctor => {
-                    const option = document.createElement('option');
-                    option.value = String(doctor.id);  // Ensure value is a string
-                    option.textContent = `${doctor.full_name} - ${doctor.specialization}`;
-                    doctorSelect.appendChild(option);
-                });
-            }
+            populateDoctorsByDepartment(this.value);
         });
+
+        if (departments.length === 0) {
+            departments = window.PUBLIC_FALLBACK_DEPARTMENTS || [];
+            doctors = window.PUBLIC_FALLBACK_DOCTORS || [];
+            populateDepartments();
+        }
+
+        const APPOINTMENT_ALERT_KEY = 'zenithcare_appointment_alert';
+        const APPOINTMENT_ALERT_DURATION_MS = 3000;
+        let alertHideTimer = null;
+
+        function hideAlerts() {
+            const successAlert = document.getElementById('successAlert');
+            const errorAlert = document.getElementById('errorAlert');
+
+            successAlert.classList.add('is-hidden');
+            errorAlert.classList.add('is-hidden');
+            sessionStorage.removeItem(APPOINTMENT_ALERT_KEY);
+        }
+
+        function scheduleAlertHide(delayMs = APPOINTMENT_ALERT_DURATION_MS) {
+            if (alertHideTimer) {
+                clearTimeout(alertHideTimer);
+            }
+
+            alertHideTimer = setTimeout(() => {
+                hideAlerts();
+            }, Math.max(0, delayMs));
+        }
+
+        function persistAlert(type, message) {
+            sessionStorage.setItem(APPOINTMENT_ALERT_KEY, JSON.stringify({ type, message, time: Date.now() }));
+        }
+
+        function restorePersistedAlert() {
+            const raw = sessionStorage.getItem(APPOINTMENT_ALERT_KEY);
+            if (!raw) return;
+
+            try {
+                const alertData = JSON.parse(raw);
+                const maxAgeMs = APPOINTMENT_ALERT_DURATION_MS;
+                const ageMs = Date.now() - (alertData.time || 0);
+
+                if (!alertData || !alertData.message || ageMs > maxAgeMs) {
+                    sessionStorage.removeItem(APPOINTMENT_ALERT_KEY);
+                    return;
+                }
+
+                const successAlert = document.getElementById('successAlert');
+                const errorAlert = document.getElementById('errorAlert');
+
+                successAlert.classList.add('is-hidden');
+                errorAlert.classList.add('is-hidden');
+
+                const target = alertData.type === 'error' ? errorAlert : successAlert;
+                target.textContent = alertData.message;
+                target.classList.remove('is-hidden');
+                scheduleAlertHide(maxAgeMs - ageMs);
+            } catch {
+                sessionStorage.removeItem(APPOINTMENT_ALERT_KEY);
+            }
+        }
+
+        restorePersistedAlert();
 
         document.getElementById('appointmentForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -212,15 +311,26 @@
             const errorAlert = document.getElementById('errorAlert');
             const submitBtn = document.getElementById('submitBtn');
 
+            const showAlert = (element, message) => {
+                element.textContent = message;
+                element.classList.remove('is-hidden');
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                const type = element.id === 'errorAlert' ? 'error' : 'success';
+                persistAlert(type, message);
+                scheduleAlertHide(APPOINTMENT_ALERT_DURATION_MS);
+            };
+
             successAlert.classList.add('is-hidden');
             errorAlert.classList.add('is-hidden');
+            sessionStorage.removeItem(APPOINTMENT_ALERT_KEY);
 
             const appointmentDate = document.getElementById('appointment_date').value;
             const appointmentTime = document.getElementById('appointment_time').value;
 
             if (!appointmentDate || !appointmentTime) {
-                errorAlert.textContent = '⚠️ Please select both date and time for the appointment';
-                errorAlert.classList.remove('is-hidden');
+                showAlert(errorAlert, '⚠️ Please select both date and time for the appointment');
                 return;
             }
 
@@ -228,8 +338,7 @@
             const appointmentDateTime = new Date(dateTimeString);
 
             if (isNaN(appointmentDateTime.getTime())) {
-                errorAlert.textContent = '⚠️ Invalid date or time selected';
-                errorAlert.classList.remove('is-hidden');
+                showAlert(errorAlert, '⚠️ Invalid date or time selected');
                 return;
             }
 
@@ -254,23 +363,34 @@
                     body: JSON.stringify(formData)
                 });
 
-                const data = await response.json();
+                let data;
+                try {
+                    data = await response.json();
+                } catch {
+                    data = null;
+                }
 
-                if (data.success) {
-                    successAlert.textContent = '✅ ' + data.message;
-                    successAlert.classList.remove('is-hidden');
+                if (response.ok && data && data.success) {
+                    showAlert(successAlert, '✅ ' + data.message);
                     document.getElementById('appointmentForm').reset();
 
-                    appointmentDateInput.min = minDate;
+                    const departmentSelect = document.getElementById('department_id');
+                    const doctorSelect = document.getElementById('doctor_id');
+                    const doctorHint = document.getElementById('doctorHint');
 
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    departmentSelect.selectedIndex = 0;
+                    doctorSelect.innerHTML = '<option value="">Any available doctor</option>';
+                    doctorSelect.selectedIndex = 0;
+                    doctorHint.textContent = 'Select a department first';
+
+                    departmentSelect.dispatchEvent(new Event('change'));
+
+                    appointmentDateInput.min = minDate;
                 } else {
-                    errorAlert.textContent = '⚠️ ' + data.message;
-                    errorAlert.classList.remove('is-hidden');
+                    showAlert(errorAlert, '⚠️ ' + ((data && data.message) ? data.message : 'Unable to book appointment. Please try again later.'));
                 }
             } catch (error) {
-                errorAlert.textContent = '⚠️ Unable to book appointment. Please try again later.';
-                errorAlert.classList.remove('is-hidden');
+                showAlert(errorAlert, '⚠️ Unable to book appointment. Please try again later.');
                 console.error('Error booking appointment:', error);
             } finally {
                 submitBtn.disabled = false;
@@ -280,8 +400,5 @@
 
         fetchData();
     </script>
-
-
-    <script src="chat-widget.js"></script>
 </body>
 </html>

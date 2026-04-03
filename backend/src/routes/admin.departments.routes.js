@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const departmentController = require('../controllers/department.controller');
-const { authenticate } = require('../middleware/auth.middleware');
+const { authenticate, authorizeAdmin } = require('../middleware/auth.middleware');
 
-router.use(authenticate);
+router.use(authenticate, authorizeAdmin);
 
 router.get('/departments', departmentController.getAllDepartments);
 

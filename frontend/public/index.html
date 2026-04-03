@@ -25,7 +25,6 @@
                     <li class="nav-item"><a class="nav-link" href="services.html">Services</a></li>
                     <li class="nav-item"><a class="nav-link" href="doctors.html">Doctors</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-                    <li class="nav-item"><a class="nav-link" href="admin-login.html">Admin</a></li>
                     <li class="nav-item ms-lg-2"><a class="btn btn-primary btn-appointment" href="appointment.html">Book Appointment</a></li>
                 </ul>
             </div>
@@ -360,6 +359,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="config.js"></script>
+    <script src="fallback-data.js"></script>
     <script>
         AOS.init({
             duration: 800,
@@ -460,14 +460,23 @@
                 if (data.success && data.data.length > 0) {
                     displayDoctors(data.data.slice(0, 8)); // Show first 8 doctors
                 } else {
-                    document.getElementById('doctorLoading').innerHTML =
-                        '<p class="text-muted">No doctors available at the moment.</p>';
+                    displayFallbackDoctors();
                 }
             } catch (error) {
                 console.error('Error loading doctors:', error);
-                document.getElementById('doctorLoading').innerHTML =
-                    '<p class="text-danger">Unable to load doctors. Please try again later.</p>';
+                displayFallbackDoctors();
             }
+        }
+
+        function displayFallbackDoctors() {
+            const fallbackDoctors = (window.PUBLIC_FALLBACK_DOCTORS || []).slice(0, 8);
+            if (fallbackDoctors.length > 0) {
+                displayDoctors(fallbackDoctors);
+                return;
+            }
+
+            document.getElementById('doctorLoading').innerHTML =
+                '<p class="text-muted">No doctors available at the moment.</p>';
         }
 
         function displayDoctors(doctors) {
@@ -517,9 +526,6 @@
 
         document.addEventListener('DOMContentLoaded', loadDoctors);
     </script>
-
-
-    <script src="chat-widget.js"></script>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {

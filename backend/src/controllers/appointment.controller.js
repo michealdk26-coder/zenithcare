@@ -8,6 +8,7 @@ const { fallbackDepartments, fallbackDoctors } = require('../config/fallbackData
 const { sendAppointmentStatusEmail } = require('../services/email.service');
 
 const FALLBACK_APPOINTMENTS_FILE = path.join(__dirname, '..', 'config', 'fallbackAppointments.json');
+const FALLBACK_APPOINTMENT_TTL_MS = 5 * 60 * 1000;
 
 const loadFallbackAppointments = () => {
   try {
@@ -38,6 +39,34 @@ const saveFallbackAppointments = () => {
 
 const fallbackAppointments = loadFallbackAppointments();
 
+const isExpiredFallbackAppointment = (appointment, now = Date.now()) => {
+  if (appointment?.expiresAt) {
+    const expiryTime = new Date(appointment.expiresAt).getTime();
+    return Number.isFinite(expiryTime) && expiryTime <= now;
+  }
+
+  const createdTime = new Date(appointment?.createdAt).getTime();
+  if (!Number.isFinite(createdTime)) {
+    return false;
+  }
+
+  return now - createdTime >= FALLBACK_APPOINTMENT_TTL_MS;
+};
+
+const pruneExpiredFallbackAppointments = () => {
+  const now = Date.now();
+  const activeAppointments = fallbackAppointments.filter((appointment) => !isExpiredFallbackAppointment(appointment, now));
+
+  if (activeAppointments.length !== fallbackAppointments.length) {
+    fallbackAppointments.splice(0, fallbackAppointments.length, ...activeAppointments);
+    saveFallbackAppointments();
+  }
+
+  return fallbackAppointments;
+};
+
+pruneExpiredFallbackAppointments();
+
 const buildFallbackAppointment = ({ patient_name, phone, email, appointment_date, department_id, doctor_id }) => {
   const numericDepartmentId = Number(department_id);
   const numericDoctorId = doctor_id !== null && doctor_id !== undefined ? Number(doctor_id) : null;
@@ -65,6 +94,7 @@ const buildFallbackAppointment = ({ patient_name, phone, email, appointment_date
     status: 'Pending',
     createdAt: timestamp,
     updatedAt: timestamp,
+    expiresAt: new Date(Date.now() + FALLBACK_APPOINTMENT_TTL_MS).toISOString(),
     department: { id: department.id, name: department.name },
     doctor: doctor ? { id: doctor.id, full_name: doctor.full_name, specialization: doctor.specialization } : null
   };
@@ -79,8 +109,46 @@ const withRelations = (appointment, departmentsMap, doctorsMap) => {
   };
 };
 
+const hydrateFallbackAppointment = (appointment) => {
+  const numericDepartmentId = Number(appointment.department_id);
+  const numericDoctorId = appointment.doctor_id !== null && appointment.doctor_id !== undefined
+    ? Number(appointment.doctor_id)
+    : null;
+
+  const department = fallbackDepartments.find((item) => item.id === numericDepartmentId);
+  const doctor = numericDoctorId
+    ? fallbackDoctors.find((item) => item.id === numericDoctorId)
+    : null;
+
+  return {
+    ...appointment,
+    department: department
+      ? {
+          id: department.id,
+          name: department.name,
+          description: department.description
+        }
+      : (appointment.department || null),
+    doctor: doctor
+      ? {
+          id: doctor.id,
+          full_name: doctor.full_name,
+          specialization: doctor.specialization,
+          availability: doctor.availability
+        }
+      : (appointment.doctor || null)
+  };
+};
+
+const getHydratedSortedFallbackAppointments = () =>
+  [...fallbackAppointments]
+    .map((appointment) => hydrateFallbackAppointment(appointment))
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
 const createAppointment = async (req, res) => {
   if (mongoose.connection.readyState !== 1) {
+    pruneExpiredFallbackAppointments();
+
     const { patient_name, phone, email, appointment_date, department_id, doctor_id } = req.body;
     if (!patient_name || !phone || !appointment_date || !department_id) {
       return res.status(400).json({
@@ -215,6 +283,8 @@ const createAppointment = async (req, res) => {
       });
     }
 
+    pruneExpiredFallbackAppointments();
+
     const fallbackAppointment = buildFallbackAppointment({
       patient_name,
       phone,
@@ -245,10 +315,13 @@ const createAppointment = async (req, res) => {
 
 const getAllAppointments = async (req, res) => {
   if (mongoose.connection.readyState !== 1) {
+    pruneExpiredFallbackAppointments();
+    const hydratedAppointments = getHydratedSortedFallbackAppointments();
+
     return res.status(200).json({
       success: true,
-      count: fallbackAppointments.length,
-      data: [...fallbackAppointments].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
+      count: hydratedAppointments.length,
+      data: hydratedAppointments,
       fallback: true
     });
   }
@@ -290,10 +363,13 @@ const getAllAppointments = async (req, res) => {
   } catch (error) {
     console.error('Error fetching appointments:', error);
 
+    pruneExpiredFallbackAppointments();
+    const hydratedAppointments = getHydratedSortedFallbackAppointments();
+
     return res.status(200).json({
       success: true,
-      count: fallbackAppointments.length,
-      data: [...fallbackAppointments].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
+      count: hydratedAppointments.length,
+      data: hydratedAppointments,
       fallback: true
     });
   }
@@ -301,6 +377,8 @@ const getAllAppointments = async (req, res) => {
 
 const updateAppointmentStatus = async (req, res) => {
   if (mongoose.connection.readyState !== 1) {
+    pruneExpiredFallbackAppointments();
+
     const { id } = req.params;
     const { status } = req.body;
 
@@ -397,6 +475,8 @@ const updateAppointmentStatus = async (req, res) => {
   } catch (error) {
     console.error('Error updating appointment:', error);
 
+    pruneExpiredFallbackAppointments();
+
     const { id } = req.params;
     const { status } = req.body;
 
@@ -443,6 +523,8 @@ const deleteAppointment = async (req, res) => {
   const numericId = Number(id);
 
   if (mongoose.connection.readyState !== 1) {
+    pruneExpiredFallbackAppointments();
+
     const index = fallbackAppointments.findIndex((item) => item.id === numericId);
     if (index === -1) {
       return res.status(404).json({

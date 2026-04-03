@@ -164,7 +164,7 @@
                                 <div class="doctor-spec">${doctor.specialization}</div>
                                 <div class="doctor-avail">📅 ${doctor.availability}</div>
                                 ${doctor.is_active ? '<div style="color: green; font-size: 0.85em; margin: 5px 0;">✅ Available</div>' : '<div style="color: red; font-size: 0.85em; margin: 5px 0;">❌ Not available</div>'}
-                                <a href="appointment.html" style="display: inline-block; margin-top: 10px; padding: 6px 12px; background: #0d6efd; color: white; text-decoration: none; border-radius: 4px; font-size: 0.85em; ${!doctor.is_active ? 'opacity: 0.5; pointer-events: none;' : ''}">📅 Book Appointment</a>
+                                <a href="appointment.html?doctor_id=${doctor.id}&department_id=${doctor.department_id}" style="display: inline-block; margin-top: 10px; padding: 6px 12px; background: #0d6efd; color: white; text-decoration: none; border-radius: 4px; font-size: 0.85em; ${!doctor.is_active ? 'opacity: 0.5; pointer-events: none;' : ''}">📅 Book Appointment</a>
                             `;
                             doctorList.appendChild(docDiv);
                         });

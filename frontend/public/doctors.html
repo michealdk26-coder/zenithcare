@@ -317,7 +317,6 @@
                 <li><a href="doctors.html" class="nav-link">Doctors</a></li>
                 <li><a href="appointment.html" class="nav-link">Book Appointment</a></li>
                 <li><a href="contact.html" class="nav-link">Contact</a></li>
-                <li><a href="admin-login.html" class="nav-link admin-link">Admin</a></li>
             </ul>
             <div class="hamburger" id="hamburger">
                 <span></span>
@@ -356,6 +355,7 @@
     </footer>
 
     <script src="config.js"></script>
+    <script src="fallback-data.js"></script>
     <script>
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('navMenu');
@@ -384,20 +384,33 @@
 
                 if (doctorsData.success && doctorsData.data.length > 0) {
                     allDoctors = doctorsData.data;
-                    allDepartments = departmentsData.success ? departmentsData.data : [];
+                    allDepartments = departmentsData.success ? departmentsData.data : (window.PUBLIC_FALLBACK_DEPARTMENTS || []);
 
                     createDepartmentFilters(allDepartments);
 
                     displayDoctors(allDoctors);
                 } else {
-                    doctorsGrid.innerHTML = '<p class="empty-state">No doctors available at the moment</p>';
+                    useFallbackDoctors();
                 }
             } catch (error) {
                 loadingSection.classList.add('is-hidden');
-                errorSection.classList.remove('is-hidden');
-                errorSection.textContent = '⚠️ Unable to load doctors. Please try again later.';
+                useFallbackDoctors();
                 console.error('Error fetching doctors:', error);
             }
+        }
+
+        function useFallbackDoctors() {
+            const loadingSection = document.getElementById('loadingSection');
+            const errorSection = document.getElementById('errorSection');
+
+            allDoctors = window.PUBLIC_FALLBACK_DOCTORS || [];
+            allDepartments = window.PUBLIC_FALLBACK_DEPARTMENTS || [];
+
+            loadingSection.classList.add('is-hidden');
+            errorSection.classList.add('is-hidden');
+
+            createDepartmentFilters(allDepartments);
+            displayDoctors(allDoctors);
         }
 
         function createDepartmentFilters(departments) {
@@ -473,8 +486,5 @@
 
         fetchDoctors();
     </script>
-
-
-    <script src="chat-widget.js"></script>
 </body>
 </html>

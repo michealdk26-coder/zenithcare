@@ -78,6 +78,7 @@
         }
 
         let allAppointments = [];
+        let appointmentsRefreshTimer = null;
 
         function handleLogout() {
             localStorage.removeItem('zenithcare_token');
@@ -93,6 +94,18 @@
                 hour: '2-digit',
                 minute: '2-digit'
             });
+        }
+
+        function getDepartmentName(appointment) {
+            if (appointment?.department?.name) {
+                return appointment.department.name;
+            }
+
+            if (appointment?.doctor?.specialization) {
+                return appointment.doctor.specialization.replace(/\s+Specialist$/i, '');
+            }
+
+            return 'N/A';
         }
 
         async function fetchAppointments() {
@@ -117,6 +130,22 @@
             }
         }
 
+        function startAppointmentsAutoRefresh() {
+            if (appointmentsRefreshTimer) {
+                clearInterval(appointmentsRefreshTimer);
+            }
+
+            appointmentsRefreshTimer = setInterval(() => {
+                fetchAppointments();
+            }, 3000);
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                fetchAppointments();
+            }
+        });
+
         function displayAppointments(appointments) {
             const tbody = document.querySelector('#appointmentsTable tbody');
             tbody.innerHTML = '';
@@ -137,7 +166,7 @@
                         ${appointment.phone}<br>
                         <small>${appointment.email || 'No email provided'}</small>
                     </td>
-                    <td>${appointment.department?.name || 'N/A'}</td>
+                    <td>${getDepartmentName(appointment)}</td>
                     <td>${appointment.doctor?.full_name || 'Not assigned'}</td>
                     <td>${formatDate(appointment.appointment_date)}</td>
                     <td><span class="status-badge ${appointment.status.toLowerCase()}">${appointment.status}</span></td>
@@ -239,6 +268,7 @@
         }
 
         fetchAppointments();
+        startAppointmentsAutoRefresh();
     </script>
 </body>
 </html>

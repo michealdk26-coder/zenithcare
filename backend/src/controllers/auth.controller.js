@@ -7,8 +7,28 @@ const FALLBACK_ADMIN_EMAIL = process.env.FALLBACK_ADMIN_EMAIL
   ? process.env.FALLBACK_ADMIN_EMAIL.toLowerCase().trim()
   : null;
 const FALLBACK_ADMIN_PASSWORD = process.env.FALLBACK_ADMIN_PASSWORD || null;
+const ALLOW_ADMIN_REGISTRATION = process.env.ALLOW_ADMIN_REGISTRATION === 'true';
+const ADMIN_SETUP_KEY = process.env.ADMIN_SETUP_KEY || null;
 
 const registerAdmin = async (req, res) => {
+  if (!ALLOW_ADMIN_REGISTRATION) {
+    return res.status(403).json({
+      success: false,
+      message: 'Admin registration is disabled'
+    });
+  }
+
+  if (ADMIN_SETUP_KEY) {
+    const providedSetupKey = req.headers['x-admin-setup-key'];
+
+    if (!providedSetupKey || providedSetupKey !== ADMIN_SETUP_KEY) {
+      return res.status(403).json({
+        success: false,
+        message: 'Invalid admin setup key'
+      });
+    }
+  }
+
   if (mongoose.connection.readyState !== 1) {
     return res.status(503).json({
       success: false,

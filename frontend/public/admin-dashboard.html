@@ -72,6 +72,8 @@
             window.location.href = 'admin-login.html';
         }
 
+        let dashboardRefreshTimer = null;
+
         function handleLogout() {
             localStorage.removeItem('zenithcare_token');
             localStorage.removeItem('zenithcare_admin');
@@ -88,7 +90,19 @@
             });
         }
 
-        async function fetchDashboardData() {
+        function getDepartmentName(appointment) {
+            if (appointment?.department?.name) {
+                return appointment.department.name;
+            }
+
+            if (appointment?.doctor?.specialization) {
+                return appointment.doctor.specialization.replace(/\s+Specialist$/i, '');
+            }
+
+            return 'N/A';
+        }
+
+        async function fetchDashboardData({ silent = false } = {}) {
             try {
                 const [appointmentsRes, doctorsRes, departmentsRes] = await Promise.all([
                     fetch(API_CONFIG.getApiUrl('/api/admin/appointments'), {
@@ -121,9 +135,27 @@
                 document.getElementById('dashboardContent').style.display = 'block';
             } catch (error) {
                 console.error('Error fetching dashboard data:', error);
-                alert('Failed to load dashboard data');
+                if (!silent) {
+                    alert('Failed to load dashboard data');
+                }
             }
         }
+
+        function startDashboardAutoRefresh() {
+            if (dashboardRefreshTimer) {
+                clearInterval(dashboardRefreshTimer);
+            }
+
+            dashboardRefreshTimer = setInterval(() => {
+                fetchDashboardData({ silent: true });
+            }, 3000);
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                fetchDashboardData({ silent: true });
+            }
+        });
 
         function displayStats(stats) {
             const statsGrid = document.getElementById('statsGrid');
@@ -186,7 +218,7 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${appointment.patient_name}</td>
-                    <td>${appointment.department?.name || 'N/A'}</td>
+                    <td>${getDepartmentName(appointment)}</td>
                     <td>${appointment.doctor?.full_name || 'Not assigned'}</td>
                     <td>${formatDate(appointment.appointment_date)}</td>
                     <td><span class="status-badge ${appointment.status.toLowerCase()}">${appointment.status}</span></td>
@@ -196,6 +228,7 @@
         }
 
         fetchDashboardData();
+        startDashboardAutoRefresh();
     </script>
 </body>
 </html>
